@@ -1,6 +1,6 @@
-import fs from 'node:fs/promises';
-import { Linter } from 'eslint';
-import { flatConfigsToRulesDTS } from 'eslint-typegen/core';
+import fs from "node:fs/promises";
+import { Linter } from "eslint";
+import { flatConfigsToRulesDTS } from "eslint-typegen/core";
 import {
   combine,
   comments,
@@ -27,10 +27,10 @@ import {
   unocss,
   vue,
   yaml,
-} from '../src';
+} from "../src";
 
 const configs = await combine(
-  { plugins: { '': { rules: Object.fromEntries(new Linter({ configType: 'eslintrc' }).getRules()) } } },
+  { plugins: { "": { rules: Object.fromEntries(new Linter({ configType: "eslintrc" }).getRules()) } } },
   comments(),
   formatters(),
   imports(),
@@ -54,7 +54,7 @@ const configs = await combine(
   unicorn(),
   unocss(),
   vue(),
-  yaml()
+  yaml(),
 );
 
 const names = configs.map(i => i.name).filter(Boolean);
@@ -62,7 +62,7 @@ const names = configs.map(i => i.name).filter(Boolean);
 let dts = await flatConfigsToRulesDTS(configs, { includeAugmentation: false });
 
 dts += `
-export type ConfigNames = ${names.map(name => `'${name}'`).join(' | ')}
+export type ConfigNames = ${names.map(name => `'${name}'`).join(" | ")}
 `;
 
-await fs.writeFile('src/types/typegen.d.ts', dts);
+await fs.writeFile("src/types/typegen.d.ts", dts);

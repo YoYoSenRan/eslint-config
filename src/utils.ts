@@ -1,19 +1,19 @@
-import type { Awaitable, TypedFlatConfigItem } from './types';
-import process from 'node:process';
-import { fileURLToPath } from 'node:url';
-import { isPackageExists } from 'local-pkg';
+import type { Awaitable, TypedFlatConfigItem } from "./types";
+import process from "node:process";
+import { fileURLToPath } from "node:url";
+import { isPackageExists } from "local-pkg";
 
 // 将当前模块的 URL 转成文件系统路径，便于在不同运行环境中定位包
-const scopeUrl = fileURLToPath(new URL('.', import.meta.url));
+const scopeUrl = fileURLToPath(new URL(".", import.meta.url));
 // 判断当前工作目录所处的 Node 模块查找范围内是否存在本包
-const isCwdInScope = isPackageExists('@senran/eslint-config');
+const isCwdInScope = isPackageExists("@senran/eslint-config");
 
 /**
  * 伪造的“空解析器”，在不需要 AST 的场景用于绕过 ESLint 的解析逻辑。
  * 通过返回空的 AST 结构和标记 `services.isPlain = true`，告知调用方这是一个占位解析结果。
  */
 export const parserPlain = {
-  meta: { name: 'parser-plain' },
+  meta: { name: "parser-plain" },
   parseForESLint: (code: string) => ({
     ast: {
       body: [],
@@ -21,7 +21,7 @@ export const parserPlain = {
       loc: { end: code.length, start: 0 },
       range: [0, code.length],
       tokens: [],
-      type: 'Program',
+      type: "Program",
     },
     scopeManager: null,
     services: { isPlain: true },
@@ -49,7 +49,7 @@ export function renameRules(rules: Record<string, any>, map: Record<string, stri
         }
       }
       return [key, value];
-    })
+    }),
   );
 }
 
@@ -57,7 +57,7 @@ export function renameRules(rules: Record<string, any>, map: Record<string, stri
  * 批量重命名 Flat Config 中的插件名，保证规则与插件引用保持一致。
  */
 export function renamePluginInConfigs(configs: TypedFlatConfigItem[], map: Record<string, string>): TypedFlatConfigItem[] {
-  return configs.map(i => {
+  return configs.map((i) => {
     const clone = { ...i };
     if (clone.rules) {
       clone.rules = renameRules(clone.rules, map);
@@ -69,7 +69,7 @@ export function renamePluginInConfigs(configs: TypedFlatConfigItem[], map: Recor
             return [map[key], value];
           }
           return [key, value];
-        })
+        }),
       );
     }
     return clone;
@@ -113,14 +113,14 @@ export async function ensurePackages(packages: (string | undefined)[]): Promise<
     return;
   }
 
-  const p = await import('@clack/prompts');
+  const p = await import("@clack/prompts");
   // 通过交互式确认，统一处理单个和多个依赖的提示语句
   const result = await p.confirm({
-    message: `${nonExistingPackages.length === 1 ? 'Package is' : 'Packages are'} required for this config: ${nonExistingPackages.join(', ')}. Do you want to install them?`,
+    message: `${nonExistingPackages.length === 1 ? "Package is" : "Packages are"} required for this config: ${nonExistingPackages.join(", ")}. Do you want to install them?`,
   });
   if (result) {
     // 动态引入安装工具，避免在无需安装时增加启动开销
-    await import('@antfu/install-pkg').then(i => i.installPackage(nonExistingPackages, { dev: true }));
+    await import("@antfu/install-pkg").then(i => i.installPackage(nonExistingPackages, { dev: true }));
   }
 }
 
@@ -141,5 +141,5 @@ export function isInEditorEnv(): boolean {
  * 判断当前执行是否源自 Git Hooks 或 lint-staged，避免与编辑器环境混淆。
  */
 export function isInGitHooksOrLintStaged(): boolean {
-  return !!(false || process.env.GIT_PARAMS || process.env.VSCODE_GIT_COMMAND || process.env.npm_lifecycle_script?.startsWith('lint-staged'));
+  return !!(false || process.env.GIT_PARAMS || process.env.VSCODE_GIT_COMMAND || process.env.npm_lifecycle_script?.startsWith("lint-staged"));
 }

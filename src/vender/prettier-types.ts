@@ -38,7 +38,7 @@ export interface VendoredPrettierOptionsRequired {
   /**
    * 尽可能在可允许的位置添加尾随逗号。
    */
-  trailingComma: 'none' | 'es5' | 'all';
+  trailingComma: "none" | "es5" | "all";
   /**
    * 对象字面量中是否在大括号内侧保留空格。
    */
@@ -65,12 +65,12 @@ export interface VendoredPrettierOptionsRequired {
    * 默认保持 Markdown 文本的手动换行，以兼容敏感渲染器；可设置为依赖编辑器软换行。
    * @default "preserve"
    */
-  proseWrap: 'always' | 'never' | 'preserve';
+  proseWrap: "always" | "never" | "preserve";
   /**
    * 箭头函数只有一个参数时是否仍保留括号。
    * @default "always"
    */
-  arrowParens: 'avoid' | 'always';
+  arrowParens: "avoid" | "always";
   /**
    * 通过插件扩展 Prettier 支持的新语言。
    */
@@ -79,17 +79,17 @@ export interface VendoredPrettierOptionsRequired {
    * HTML 中的空白折叠策略。
    * @default "css"
    */
-  htmlWhitespaceSensitivity: 'css' | 'strict' | 'ignore';
+  htmlWhitespaceSensitivity: "css" | "strict" | "ignore";
   /**
    * 输出时使用的换行符类型。
    * @default "lf"
    */
-  endOfLine: 'auto' | 'lf' | 'crlf' | 'cr';
+  endOfLine: "auto" | "lf" | "crlf" | "cr";
   /**
    * 对象属性名加引号的策略。
    * @default "as-needed"
    */
-  quoteProps: 'as-needed' | 'consistent' | 'preserve';
+  quoteProps: "as-needed" | "consistent" | "preserve";
   /**
    * Vue 文件中是否缩进 `<script>` 和 `<style>` 内的代码。
    * @default false
@@ -105,7 +105,7 @@ export interface VendoredPrettierOptionsRequired {
    * XML 属性值使用的引号类型。
    * @default "preserve"
    */
-  xmlQuoteAttributes: 'single' | 'double' | 'preserve';
+  xmlQuoteAttributes: "single" | "double" | "preserve";
   /**
    * XML 自闭合标签的 `/>` 是否保留空格。
    * @default true
@@ -120,36 +120,36 @@ export interface VendoredPrettierOptionsRequired {
    * XML 中的空白折叠策略。
    * @default "ignore"
    */
-  xmlWhitespaceSensitivity: 'ignore' | 'strict' | 'preserve';
+  xmlWhitespaceSensitivity: "ignore" | "strict" | "preserve";
 }
 
-export type BuiltInParserName =
-  | 'acorn'
-  | 'angular'
-  | 'babel-flow'
-  | 'babel-ts'
-  | 'babel'
-  | 'css'
-  | 'espree'
-  | 'flow'
-  | 'glimmer'
-  | 'graphql'
-  | 'html'
-  | 'json-stringify'
-  | 'json'
-  | 'json5'
-  | 'less'
-  | 'lwc'
-  | 'markdown'
-  | 'mdx'
-  | 'meriyah'
-  | 'scss'
-  | 'typescript'
-  | 'vue'
-  | 'xml'
-  | 'yaml';
+export type BuiltInParserName
+  = | "acorn"
+    | "angular"
+    | "babel-flow"
+    | "babel-ts"
+    | "babel"
+    | "css"
+    | "espree"
+    | "flow"
+    | "glimmer"
+    | "graphql"
+    | "html"
+    | "json-stringify"
+    | "json"
+    | "json5"
+    | "less"
+    | "lwc"
+    | "markdown"
+    | "mdx"
+    | "meriyah"
+    | "scss"
+    | "typescript"
+    | "vue"
+    | "xml"
+    | "yaml";
 
-export type ExternalParserName = 'slidev' | 'astro';
+export type ExternalParserName = "slidev" | "astro";
 
 // 为了解决在字符串字面量联合中混入 string 泛型导致类型信息丢失的问题。
 // LiteralUnion 能保留原始字面量联合的智能提示能力：见 microsoft/TypeScript#29729。

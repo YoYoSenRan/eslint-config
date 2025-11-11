@@ -1,7 +1,7 @@
-import type { OptionsFiles, OptionsIsInEditor, OptionsOverrides, TypedFlatConfigItem } from '../types';
+import type { OptionsFiles, OptionsIsInEditor, OptionsOverrides, TypedFlatConfigItem } from "../types";
 
-import { GLOB_TESTS } from '../globs';
-import { interopDefault } from '../utils';
+import { GLOB_TESTS } from "../globs";
+import { interopDefault } from "../utils";
 
 // 缓存插件实例，避免每次调用都重新声明
 let _pluginTest: any;
@@ -13,9 +13,9 @@ export async function test(options: OptionsFiles & OptionsIsInEditor & OptionsOv
   const { files = GLOB_TESTS, isInEditor = false, overrides = {} } = options;
 
   const [pluginVitest, pluginNoOnlyTests] = await Promise.all([
-    interopDefault(import('@vitest/eslint-plugin')),
+    interopDefault(import("@vitest/eslint-plugin")),
     // @ts-expect-error missing types
-    interopDefault(import('eslint-plugin-no-only-tests')),
+    interopDefault(import("eslint-plugin-no-only-tests")),
   ] as const);
 
   _pluginTest = _pluginTest || {
@@ -29,29 +29,29 @@ export async function test(options: OptionsFiles & OptionsIsInEditor & OptionsOv
 
   return [
     {
-      name: 'senran/test/setup',
+      name: "senran/test/setup",
       plugins: {
         test: _pluginTest,
       },
     },
     {
       files,
-      name: 'senran/test/rules',
+      name: "senran/test/rules",
       rules: {
         // --- Vitest/测试文件惯例，保证命名与生命周期一致 ---
-        'test/consistent-test-it': ['error', { fn: 'it', withinDescribe: 'it' }], // 统一使用 it/describe
-        'test/no-identical-title': 'error', // describe/it 标题不可重复
-        'test/no-import-node-test': 'error', // 不允许从 node:test 导入
-        'test/no-only-tests': isInEditor ? 'warn' : 'error', // 禁用 .only，编辑器降级
+        "test/consistent-test-it": ["error", { fn: "it", withinDescribe: "it" }], // 统一使用 it/describe
+        "test/no-identical-title": "error", // describe/it 标题不可重复
+        "test/no-import-node-test": "error", // 不允许从 node:test 导入
+        "test/no-only-tests": isInEditor ? "warn" : "error", // 禁用 .only，编辑器降级
 
-        'test/prefer-hooks-in-order': 'error', // before/after 顺序固定
-        'test/prefer-lowercase-title': 'error', // 标题使用小写
+        "test/prefer-hooks-in-order": "error", // before/after 顺序固定
+        "test/prefer-lowercase-title": "error", // 标题使用小写
 
         // 针对测试场景放宽的核心规则
         ...{
-          'no-unused-expressions': 'off', // 允许 expect 链式表达式
-          'node/prefer-global/process': 'off', // 测试中可直接访问 process
-          'ts/explicit-function-return-type': 'off', // 测试函数可省略返回类型
+          "no-unused-expressions": "off", // 允许 expect 链式表达式
+          "node/prefer-global/process": "off", // 测试中可直接访问 process
+          "ts/explicit-function-return-type": "off", // 测试函数可省略返回类型
         },
 
         ...overrides,

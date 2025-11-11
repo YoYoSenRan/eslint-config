@@ -1,11 +1,11 @@
-import type { OptionsFormatters, StylisticConfig, TypedFlatConfigItem } from '../types';
-import type { VendoredPrettierOptions, VendoredPrettierRuleOptions } from '../vender/prettier-types';
+import type { OptionsFormatters, StylisticConfig, TypedFlatConfigItem } from "../types";
+import type { VendoredPrettierOptions, VendoredPrettierRuleOptions } from "../vender/prettier-types";
 
-import { isPackageExists } from 'local-pkg';
-import { GLOB_ASTRO, GLOB_ASTRO_TS, GLOB_CSS, GLOB_GRAPHQL, GLOB_HTML, GLOB_LESS, GLOB_MARKDOWN, GLOB_POSTCSS, GLOB_SCSS, GLOB_SVG, GLOB_XML } from '../globs';
+import { isPackageExists } from "local-pkg";
+import { GLOB_ASTRO, GLOB_ASTRO_TS, GLOB_CSS, GLOB_GRAPHQL, GLOB_HTML, GLOB_LESS, GLOB_MARKDOWN, GLOB_POSTCSS, GLOB_SCSS, GLOB_SVG, GLOB_XML } from "../globs";
 
-import { ensurePackages, interopDefault, isPackageInScope, parserPlain } from '../utils';
-import { StylisticConfigDefaults } from './stylistic';
+import { ensurePackages, interopDefault, isPackageInScope, parserPlain } from "../utils";
+import { StylisticConfigDefaults } from "./stylistic";
 
 /**
  * 将通用的 Prettier 选项与特定文件的覆盖项合并，确保插件数组被安全拼接。
@@ -25,28 +25,28 @@ function mergePrettierOptions(options: VendoredPrettierOptions, overrides: Vendo
 export async function formatters(options: OptionsFormatters | true = {}, stylistic: StylisticConfig = {}): Promise<TypedFlatConfigItem[]> {
   // 帮用户自动根据依赖开启 formatter，减少显式配置成本
   if (options === true) {
-    const isPrettierPluginXmlInScope = isPackageInScope('@prettier/plugin-xml');
+    const isPrettierPluginXmlInScope = isPackageInScope("@prettier/plugin-xml");
     options = {
-      astro: isPackageInScope('prettier-plugin-astro'),
+      astro: isPackageInScope("prettier-plugin-astro"),
       css: true,
       graphql: true,
       html: true,
       markdown: true,
-      slidev: isPackageExists('@slidev/cli'),
+      slidev: isPackageExists("@slidev/cli"),
       svg: isPrettierPluginXmlInScope,
       xml: isPrettierPluginXmlInScope,
     };
   }
 
   await ensurePackages([
-    'eslint-plugin-format',
-    options.markdown && options.slidev ? 'prettier-plugin-slidev' : undefined,
-    options.astro ? 'prettier-plugin-astro' : undefined,
-    options.xml || options.svg ? '@prettier/plugin-xml' : undefined,
+    "eslint-plugin-format",
+    options.markdown && options.slidev ? "prettier-plugin-slidev" : undefined,
+    options.astro ? "prettier-plugin-astro" : undefined,
+    options.xml || options.svg ? "@prettier/plugin-xml" : undefined,
   ]);
 
-  if (options.slidev && options.markdown !== true && options.markdown !== 'prettier') {
-    throw new Error('`slidev` option only works when `markdown` is enabled with `prettier`');
+  if (options.slidev && options.markdown !== true && options.markdown !== "prettier") {
+    throw new Error("`slidev` option only works when `markdown` is enabled with `prettier`");
   }
 
   const { indent, quotes, semi } = {
@@ -56,38 +56,38 @@ export async function formatters(options: OptionsFormatters | true = {}, stylist
 
   const prettierOptions: VendoredPrettierOptions = Object.assign(
     {
-      endOfLine: 'auto',
+      endOfLine: "auto",
       printWidth: 150,
       semi,
-      singleQuote: quotes === 'single',
-      tabWidth: typeof indent === 'number' ? indent : 2,
-      trailingComma: 'all',
-      useTabs: indent === 'tab',
+      singleQuote: quotes === "single",
+      tabWidth: typeof indent === "number" ? indent : 2,
+      trailingComma: "all",
+      useTabs: indent === "tab",
     } satisfies VendoredPrettierOptions,
-    options.prettierOptions || {}
+    options.prettierOptions || {},
   );
 
   const prettierXmlOptions: VendoredPrettierOptions = {
-    xmlQuoteAttributes: 'double',
+    xmlQuoteAttributes: "double",
     xmlSelfClosingSpace: true,
     xmlSortAttributesByKey: false,
-    xmlWhitespaceSensitivity: 'ignore',
+    xmlWhitespaceSensitivity: "ignore",
   };
 
   const dprintOptions = Object.assign(
     {
-      indentWidth: typeof indent === 'number' ? indent : 2,
-      quoteStyle: quotes === 'single' ? 'preferSingle' : 'preferDouble',
-      useTabs: indent === 'tab',
+      indentWidth: typeof indent === "number" ? indent : 2,
+      quoteStyle: quotes === "single" ? "preferSingle" : "preferDouble",
+      useTabs: indent === "tab",
     },
-    options.dprintOptions || {}
+    options.dprintOptions || {},
   );
 
-  const pluginFormat = await interopDefault(import('eslint-plugin-format'));
+  const pluginFormat = await interopDefault(import("eslint-plugin-format"));
 
   const configs: TypedFlatConfigItem[] = [
     {
-      name: 'senran/formatter/setup',
+      name: "senran/formatter/setup",
       plugins: {
         format: pluginFormat,
       },
@@ -101,13 +101,13 @@ export async function formatters(options: OptionsFormatters | true = {}, stylist
         languageOptions: {
           parser: parserPlain,
         },
-        name: 'senran/formatter/css',
+        name: "senran/formatter/css",
         rules: {
           // --- 使用 Prettier 对 CSS/PostCSS 保持一致格式 ---
-          'format/prettier': [
-            'error',
+          "format/prettier": [
+            "error",
             mergePrettierOptions(prettierOptions, {
-              parser: 'css',
+              parser: "css",
             }),
           ],
         },
@@ -117,13 +117,13 @@ export async function formatters(options: OptionsFormatters | true = {}, stylist
         languageOptions: {
           parser: parserPlain,
         },
-        name: 'senran/formatter/scss',
+        name: "senran/formatter/scss",
         rules: {
           // --- SCSS 复用 Prettier 方案，兼容 mixin/变量 ---
-          'format/prettier': [
-            'error',
+          "format/prettier": [
+            "error",
             mergePrettierOptions(prettierOptions, {
-              parser: 'scss',
+              parser: "scss",
             }),
           ],
         },
@@ -133,17 +133,17 @@ export async function formatters(options: OptionsFormatters | true = {}, stylist
         languageOptions: {
           parser: parserPlain,
         },
-        name: 'senran/formatter/less',
+        name: "senran/formatter/less",
         rules: {
           // --- Less 同样交给 Prettier 处理 ---
-          'format/prettier': [
-            'error',
+          "format/prettier": [
+            "error",
             mergePrettierOptions(prettierOptions, {
-              parser: 'less',
+              parser: "less",
             }),
           ],
         },
-      }
+      },
     );
   }
 
@@ -153,13 +153,13 @@ export async function formatters(options: OptionsFormatters | true = {}, stylist
       languageOptions: {
         parser: parserPlain,
       },
-      name: 'senran/formatter/html',
+      name: "senran/formatter/html",
       rules: {
         // --- HTML 模板交给 Prettier，避免 AST 分析误判 ---
-        'format/prettier': [
-          'error',
+        "format/prettier": [
+          "error",
           mergePrettierOptions(prettierOptions, {
-            parser: 'html',
+            parser: "html",
           }),
         ],
       },
@@ -172,17 +172,17 @@ export async function formatters(options: OptionsFormatters | true = {}, stylist
       languageOptions: {
         parser: parserPlain,
       },
-      name: 'senran/formatter/xml',
+      name: "senran/formatter/xml",
       rules: {
         // --- XML 通过官方插件来格式化 ---
-        'format/prettier': [
-          'error',
+        "format/prettier": [
+          "error",
           mergePrettierOptions(
             { ...prettierXmlOptions, ...prettierOptions },
             {
-              parser: 'xml',
-              plugins: ['@prettier/plugin-xml'],
-            }
+              parser: "xml",
+              plugins: ["@prettier/plugin-xml"],
+            },
           ),
         ],
       },
@@ -194,17 +194,17 @@ export async function formatters(options: OptionsFormatters | true = {}, stylist
       languageOptions: {
         parser: parserPlain,
       },
-      name: 'senran/formatter/svg',
+      name: "senran/formatter/svg",
       rules: {
         // --- SVG 视作 XML 处理，应用同样的插件 ---
-        'format/prettier': [
-          'error',
+        "format/prettier": [
+          "error",
           mergePrettierOptions(
             { ...prettierXmlOptions, ...prettierOptions },
             {
-              parser: 'xml',
-              plugins: ['@prettier/plugin-xml'],
-            }
+              parser: "xml",
+              plugins: ["@prettier/plugin-xml"],
+            },
           ),
         ],
       },
@@ -212,9 +212,9 @@ export async function formatters(options: OptionsFormatters | true = {}, stylist
   }
 
   if (options.markdown) {
-    const formater = options.markdown === true ? 'prettier' : options.markdown;
+    const formater = options.markdown === true ? "prettier" : options.markdown;
 
-    const GLOB_SLIDEV = !options.slidev ? [] : options.slidev === true ? ['**/slides.md'] : options.slidev.files;
+    const GLOB_SLIDEV = !options.slidev ? [] : options.slidev === true ? ["**/slides.md"] : options.slidev.files;
 
     configs.push({
       files: [GLOB_MARKDOWN],
@@ -222,19 +222,19 @@ export async function formatters(options: OptionsFormatters | true = {}, stylist
       languageOptions: {
         parser: parserPlain,
       },
-      name: 'senran/formatter/markdown',
+      name: "senran/formatter/markdown",
       rules: {
         // --- Markdown 默认交由 Prettier/dprint 处理，禁用嵌入语言自动格式 ---
         [`format/${formater}`]: [
-          'error',
-          formater === 'prettier'
+          "error",
+          formater === "prettier"
             ? mergePrettierOptions(prettierOptions, {
-                embeddedLanguageFormatting: 'off',
-                parser: 'markdown',
+                embeddedLanguageFormatting: "off",
+                parser: "markdown",
               })
             : {
                 ...dprintOptions,
-                language: 'markdown',
+                language: "markdown",
               },
         ],
       },
@@ -246,15 +246,15 @@ export async function formatters(options: OptionsFormatters | true = {}, stylist
         languageOptions: {
           parser: parserPlain,
         },
-      name: 'senran/formatter/slidev',
-      rules: {
+        name: "senran/formatter/slidev",
+        rules: {
         // --- Slidev 幻灯片启用专用 Prettier 插件 ---
-        'format/prettier': [
-            'error',
+          "format/prettier": [
+            "error",
             mergePrettierOptions(prettierOptions, {
-              embeddedLanguageFormatting: 'off',
-              parser: 'slidev',
-              plugins: ['prettier-plugin-slidev'],
+              embeddedLanguageFormatting: "off",
+              parser: "slidev",
+              plugins: ["prettier-plugin-slidev"],
             }),
           ],
         },
@@ -268,14 +268,14 @@ export async function formatters(options: OptionsFormatters | true = {}, stylist
       languageOptions: {
         parser: parserPlain,
       },
-      name: 'senran/formatter/astro',
+      name: "senran/formatter/astro",
       rules: {
         // --- Astro SFC 由 Prettier + 插件格式化 ---
-        'format/prettier': [
-          'error',
+        "format/prettier": [
+          "error",
           mergePrettierOptions(prettierOptions, {
-            parser: 'astro',
-            plugins: ['prettier-plugin-astro'],
+            parser: "astro",
+            plugins: ["prettier-plugin-astro"],
           }),
         ],
       },
@@ -283,16 +283,16 @@ export async function formatters(options: OptionsFormatters | true = {}, stylist
 
     configs.push({
       files: [GLOB_ASTRO, GLOB_ASTRO_TS],
-      name: 'senran/formatter/astro/disables',
+      name: "senran/formatter/astro/disables",
       rules: {
         // --- 避免与 Astro SFC 中的模板格式互相冲突 ---
-        'style/arrow-parens': 'off', // 交由 Prettier 统一
-        'style/block-spacing': 'off', // 防止 ESLint 与 Prettier 打架
-        'style/comma-dangle': 'off', // 关闭尾随逗号校验
-        'style/indent': 'off', // 缩进由 Prettier 控制
-        'style/no-multi-spaces': 'off', // 保留 Prettier 输出
-        'style/quotes': 'off', // 引号风格交给 Prettier
-        'style/semi': 'off', // 分号风格交给 Prettier
+        "style/arrow-parens": "off", // 交由 Prettier 统一
+        "style/block-spacing": "off", // 防止 ESLint 与 Prettier 打架
+        "style/comma-dangle": "off", // 关闭尾随逗号校验
+        "style/indent": "off", // 缩进由 Prettier 控制
+        "style/no-multi-spaces": "off", // 保留 Prettier 输出
+        "style/quotes": "off", // 引号风格交给 Prettier
+        "style/semi": "off", // 分号风格交给 Prettier
       },
     });
   }
@@ -303,13 +303,13 @@ export async function formatters(options: OptionsFormatters | true = {}, stylist
       languageOptions: {
         parser: parserPlain,
       },
-      name: 'senran/formatter/graphql',
+      name: "senran/formatter/graphql",
       rules: {
         // --- GraphQL Schema/查询使用 Prettier ---
-        'format/prettier': [
-          'error',
+        "format/prettier": [
+          "error",
           mergePrettierOptions(prettierOptions, {
-            parser: 'graphql',
+            parser: "graphql",
           }),
         ],
       },

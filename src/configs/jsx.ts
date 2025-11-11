@@ -1,6 +1,6 @@
-import type { OptionsJSX, TypedFlatConfigItem } from '../types';
-import { GLOB_JSX, GLOB_TSX } from '../globs';
-import { ensurePackages, interopDefault } from '../utils';
+import type { OptionsJSX, TypedFlatConfigItem } from "../types";
+import { GLOB_JSX, GLOB_TSX } from "../globs";
+import { ensurePackages, interopDefault } from "../utils";
 
 /**
  * 为 JSX/TSX 文件启用基础语法支持，可选开启 `a11y` 规则覆盖来对接 `eslint-plugin-jsx-a11y`。
@@ -18,7 +18,7 @@ export async function jsx(options: OptionsJSX = {}): Promise<TypedFlatConfigItem
         },
       },
     },
-    name: 'senran/jsx/setup',
+    name: "senran/jsx/setup",
     plugins: {},
     rules: {},
   };
@@ -28,13 +28,13 @@ export async function jsx(options: OptionsJSX = {}): Promise<TypedFlatConfigItem
     return [baseConfig];
   }
 
-  await ensurePackages(['eslint-plugin-jsx-a11y']);
-  const jsxA11yPlugin = await interopDefault(import('eslint-plugin-jsx-a11y'));
+  await ensurePackages(["eslint-plugin-jsx-a11y"]);
+  const jsxA11yPlugin = await interopDefault(import("eslint-plugin-jsx-a11y"));
   const a11yConfig = jsxA11yPlugin.flatConfigs.recommended;
 
   const a11yRules = {
     ...(a11yConfig.rules || {}),
-    ...(typeof a11y === 'object' && a11y.overrides ? a11y.overrides : {}),
+    ...(typeof a11y === "object" && a11y.overrides ? a11y.overrides : {}),
   };
 
   // 将基础 JSX 解析能力与 a11y 规则合并
@@ -50,7 +50,7 @@ export async function jsx(options: OptionsJSX = {}): Promise<TypedFlatConfigItem
       name: baseConfig.name,
       plugins: {
         ...baseConfig.plugins,
-        'jsx-a11y': jsxA11yPlugin,
+        "jsx-a11y": jsxA11yPlugin,
       },
       rules: {
         // --- 合并基础 JSX 行为与无障碍增强规则 ---
