@@ -7,6 +7,9 @@ import { GLOB_ASTRO, GLOB_ASTRO_TS, GLOB_CSS, GLOB_GRAPHQL, GLOB_HTML, GLOB_LESS
 import { ensurePackages, interopDefault, isPackageInScope, parserPlain } from '../utils';
 import { StylisticConfigDefaults } from './stylistic';
 
+/**
+ * 将通用的 Prettier 选项与特定文件的覆盖项合并，确保插件数组被安全拼接。
+ */
 function mergePrettierOptions(options: VendoredPrettierOptions, overrides: VendoredPrettierRuleOptions = {}): VendoredPrettierRuleOptions {
   return {
     ...options,
@@ -15,7 +18,12 @@ function mergePrettierOptions(options: VendoredPrettierOptions, overrides: Vendo
   };
 }
 
+/**
+ * 统一在 ESLint 中调用 formatter 插件（Prettier 或 dprint），为样式、Markdown、Astro 等文件提供自动格式化能力。
+ * 当 `options === true` 时会根据已安装依赖自动开启对应 formatter。
+ */
 export async function formatters(options: OptionsFormatters | true = {}, stylistic: StylisticConfig = {}): Promise<TypedFlatConfigItem[]> {
+  // 帮用户自动根据依赖开启 formatter，减少显式配置成本
   if (options === true) {
     const isPrettierPluginXmlInScope = isPackageInScope('@prettier/plugin-xml');
     options = {
@@ -49,7 +57,7 @@ export async function formatters(options: OptionsFormatters | true = {}, stylist
   const prettierOptions: VendoredPrettierOptions = Object.assign(
     {
       endOfLine: 'auto',
-      printWidth: 120,
+      printWidth: 150,
       semi,
       singleQuote: quotes === 'single',
       tabWidth: typeof indent === 'number' ? indent : 2,
@@ -95,6 +103,7 @@ export async function formatters(options: OptionsFormatters | true = {}, stylist
         },
         name: 'senran/formatter/css',
         rules: {
+          // --- 使用 Prettier 对 CSS/PostCSS 保持一致格式 ---
           'format/prettier': [
             'error',
             mergePrettierOptions(prettierOptions, {
@@ -110,6 +119,7 @@ export async function formatters(options: OptionsFormatters | true = {}, stylist
         },
         name: 'senran/formatter/scss',
         rules: {
+          // --- SCSS 复用 Prettier 方案，兼容 mixin/变量 ---
           'format/prettier': [
             'error',
             mergePrettierOptions(prettierOptions, {
@@ -125,6 +135,7 @@ export async function formatters(options: OptionsFormatters | true = {}, stylist
         },
         name: 'senran/formatter/less',
         rules: {
+          // --- Less 同样交给 Prettier 处理 ---
           'format/prettier': [
             'error',
             mergePrettierOptions(prettierOptions, {
@@ -144,6 +155,7 @@ export async function formatters(options: OptionsFormatters | true = {}, stylist
       },
       name: 'senran/formatter/html',
       rules: {
+        // --- HTML 模板交给 Prettier，避免 AST 分析误判 ---
         'format/prettier': [
           'error',
           mergePrettierOptions(prettierOptions, {
@@ -162,6 +174,7 @@ export async function formatters(options: OptionsFormatters | true = {}, stylist
       },
       name: 'senran/formatter/xml',
       rules: {
+        // --- XML 通过官方插件来格式化 ---
         'format/prettier': [
           'error',
           mergePrettierOptions(
@@ -183,6 +196,7 @@ export async function formatters(options: OptionsFormatters | true = {}, stylist
       },
       name: 'senran/formatter/svg',
       rules: {
+        // --- SVG 视作 XML 处理，应用同样的插件 ---
         'format/prettier': [
           'error',
           mergePrettierOptions(
@@ -210,6 +224,7 @@ export async function formatters(options: OptionsFormatters | true = {}, stylist
       },
       name: 'senran/formatter/markdown',
       rules: {
+        // --- Markdown 默认交由 Prettier/dprint 处理，禁用嵌入语言自动格式 ---
         [`format/${formater}`]: [
           'error',
           formater === 'prettier'
@@ -231,9 +246,10 @@ export async function formatters(options: OptionsFormatters | true = {}, stylist
         languageOptions: {
           parser: parserPlain,
         },
-        name: 'senran/formatter/slidev',
-        rules: {
-          'format/prettier': [
+      name: 'senran/formatter/slidev',
+      rules: {
+        // --- Slidev 幻灯片启用专用 Prettier 插件 ---
+        'format/prettier': [
             'error',
             mergePrettierOptions(prettierOptions, {
               embeddedLanguageFormatting: 'off',
@@ -254,6 +270,7 @@ export async function formatters(options: OptionsFormatters | true = {}, stylist
       },
       name: 'senran/formatter/astro',
       rules: {
+        // --- Astro SFC 由 Prettier + 插件格式化 ---
         'format/prettier': [
           'error',
           mergePrettierOptions(prettierOptions, {
@@ -268,13 +285,14 @@ export async function formatters(options: OptionsFormatters | true = {}, stylist
       files: [GLOB_ASTRO, GLOB_ASTRO_TS],
       name: 'senran/formatter/astro/disables',
       rules: {
-        'style/arrow-parens': 'off',
-        'style/block-spacing': 'off',
-        'style/comma-dangle': 'off',
-        'style/indent': 'off',
-        'style/no-multi-spaces': 'off',
-        'style/quotes': 'off',
-        'style/semi': 'off',
+        // --- 避免与 Astro SFC 中的模板格式互相冲突 ---
+        'style/arrow-parens': 'off', // 交由 Prettier 统一
+        'style/block-spacing': 'off', // 防止 ESLint 与 Prettier 打架
+        'style/comma-dangle': 'off', // 关闭尾随逗号校验
+        'style/indent': 'off', // 缩进由 Prettier 控制
+        'style/no-multi-spaces': 'off', // 保留 Prettier 输出
+        'style/quotes': 'off', // 引号风格交给 Prettier
+        'style/semi': 'off', // 分号风格交给 Prettier
       },
     });
   }
@@ -287,6 +305,7 @@ export async function formatters(options: OptionsFormatters | true = {}, stylist
       },
       name: 'senran/formatter/graphql',
       rules: {
+        // --- GraphQL Schema/查询使用 Prettier ---
         'format/prettier': [
           'error',
           mergePrettierOptions(prettierOptions, {

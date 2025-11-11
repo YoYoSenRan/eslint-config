@@ -3,6 +3,9 @@ import { GLOB_JSX, GLOB_TSX } from '../globs';
 
 import { ensurePackages, interopDefault, toArray } from '../utils';
 
+/**
+ * Solid 应用的推荐规则集，若提供 `tsconfigPath` 则自动开启类型感知模式，并根据 `typescript` 选项包容纯 JS 项目。
+ */
 export async function solid(options: OptionsHasTypeScript & OptionsOverrides & OptionsFiles & OptionsTypeScriptWithTypes = {}): Promise<TypedFlatConfigItem[]> {
   const { files = [GLOB_JSX, GLOB_TSX], overrides = {}, typescript = true } = options;
 
@@ -34,41 +37,39 @@ export async function solid(options: OptionsHasTypeScript & OptionsOverrides & O
       },
       name: 'senran/solid/rules',
       rules: {
-        // reactivity
-        'solid/components-return-once': 'warn',
+        // --- 核心响应式语义 ---
+        'solid/components-return-once': 'warn', // 组件仅返回一次避免条件 return
         'solid/event-handlers': [
           'error',
           {
-            // if true, don't warn on ambiguously named event handlers like `onclick` or `onchange`
-            ignoreCase: false,
-            // if true, warn when spreading event handlers onto JSX. Enable for Solid < v1.6.
-            warnOnSpread: false,
+            ignoreCase: false, // 为 true 时允许 onclick/onchange 等歧义处理器
+            warnOnSpread: false, // Solid <1.6 禁止事件处理器 spread
           },
         ],
-        // these rules are mostly style suggestions
-        'solid/imports': 'error',
-        // identifier usage is important
-        'solid/jsx-no-duplicate-props': 'error',
-        'solid/jsx-no-script-url': 'error',
-        'solid/jsx-no-undef': 'error',
-        'solid/jsx-uses-vars': 'error',
-        'solid/no-destructure': 'error',
-        // security problems
-        'solid/no-innerhtml': ['error', { allowStatic: true }],
-        'solid/no-react-deps': 'error',
-        'solid/no-react-specific-props': 'error',
-        'solid/no-unknown-namespaces': 'error',
-        'solid/prefer-for': 'error',
-        'solid/reactivity': 'warn',
-        'solid/self-closing-comp': 'error',
-        'solid/style-prop': ['error', { styleProps: ['style', 'css'] }],
+        // 风格类建议
+        'solid/imports': 'error', // 自动补全 Solid API import
+        // 标识符与 JSX 相关的约束
+        'solid/jsx-no-duplicate-props': 'error', // JSX props 不可重复
+        'solid/jsx-no-script-url': 'error', // 禁用 script: URL
+        'solid/jsx-no-undef': 'error', // JSX 中声明的组件必须定义
+        'solid/jsx-uses-vars': 'error', // JSX 使用的变量不能标记为未使用
+        'solid/no-destructure': 'error', // 避免 props 解构失去响应性
+        // 安全相关
+        'solid/no-innerhtml': ['error', { allowStatic: true }], // 禁用危险 innerHTML
+        'solid/no-react-deps': 'error', // 不允许使用 React 特有依赖
+        'solid/no-react-specific-props': 'error', // 禁止 React 专属 props
+        'solid/no-unknown-namespaces': 'error', // JSX 命名空间必须已知
+        'solid/prefer-for': 'error', // 循环使用 <For> 而非 map
+        'solid/reactivity': 'warn', // 检查响应式语法使用
+        'solid/self-closing-comp': 'error', // 无子节点组件使用自闭合
+        'solid/style-prop': ['error', { styleProps: ['style', 'css'] }], // style/ css 属性需使用对象
         ...(typescript
           ? {
-              'solid/jsx-no-undef': ['error', { typescriptEnabled: true }],
-              'solid/no-unknown-namespaces': 'off',
+              'solid/jsx-no-undef': ['error', { typescriptEnabled: true }], // TS 模式下开启类型感知
+              'solid/no-unknown-namespaces': 'off', // TS 自身处理命名空间
             }
           : {}),
-        // overrides
+        // 用户自定义规则
         ...overrides,
       },
     },

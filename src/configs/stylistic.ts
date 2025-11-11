@@ -12,6 +12,9 @@ export interface StylisticOptions extends StylisticConfig, OptionsOverrides {
   lessOpinionated?: boolean;
 }
 
+/**
+ * 基于 `@stylistic/eslint-plugin` 的格式化规则，可覆盖缩进/引号/分号等风格，并注入额外的团队规范。
+ */
 export async function stylistic(options: StylisticOptions = {}): Promise<TypedFlatConfigItem[]> {
   const {
     indent,
@@ -42,14 +45,16 @@ export async function stylistic(options: StylisticOptions = {}): Promise<TypedFl
         style: pluginStylistic,
       },
       rules: {
+        // --- 基于 Stylistic 的统一风格设置 ---
         ...config.rules,
 
-        'style/brace-style': ['error', '1tbs', { allowSingleLine: false }],
-        'style/member-delimiter-style': ['error', { multiline: { delimiter: 'semi' } }],
+        // --- 额外补充团队常用风格 ---
+        'style/brace-style': ['error', '1tbs', { allowSingleLine: false }], // 花括号 1TBS 风格
+        'style/member-delimiter-style': ['error', { multiline: { delimiter: 'semi' } }], // 接口成员以分号结尾
 
-        curly: ['error', 'all'],
-        'style/generator-star-spacing': ['error', { after: true, before: false }],
-        'style/yield-star-spacing': ['error', { after: true, before: false }],
+        curly: ['error', 'all'], // 所有控制语句必须使用花括号
+        'style/generator-star-spacing': ['error', { after: true, before: false }], // function* 星号贴 function
+        'style/yield-star-spacing': ['error', { after: true, before: false }], // yield* 星号靠前
 
         ...overrides,
       },

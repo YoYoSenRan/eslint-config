@@ -2,6 +2,9 @@ import type { TypedFlatConfigItem } from '../types';
 
 import { pluginNode } from '../plugin';
 
+/**
+ * Node.js 运行时相关的安全规则，覆盖回调错误处理、API 废弃提示等。
+ */
 export async function node(): Promise<TypedFlatConfigItem[]> {
   return [
     {
@@ -10,14 +13,15 @@ export async function node(): Promise<TypedFlatConfigItem[]> {
         node: pluginNode,
       },
       rules: {
-        'node/handle-callback-err': ['error', '^(err|error)$'],
-        'node/no-deprecated-api': 'error',
-        'node/no-exports-assign': 'error',
-        'node/no-new-require': 'error',
-        'node/no-path-concat': 'error',
-        'node/prefer-global/buffer': ['error', 'never'],
-        'node/prefer-global/process': ['error', 'never'],
-        'node/process-exit-as-throw': 'error',
+        // --- Node.js 特有的 API 安全校验 ---
+        'node/handle-callback-err': ['error', '^(err|error)$'], // 回调错误参数需命名为 err
+        'node/no-deprecated-api': 'error', // 不使用已废弃 API
+        'node/no-exports-assign': 'error', // 禁止给 module.exports 重新赋值为非对象
+        'node/no-new-require': 'error', // 禁止 new require
+        'node/no-path-concat': 'error', // 避免 __dirname + 字符串
+        'node/prefer-global/buffer': ['error', 'never'], // 使用局部 Buffer 而非全局
+        'node/prefer-global/process': ['error', 'never'], // 不直接用全局 process
+        'node/process-exit-as-throw': 'error', // 禁止直接 process.exit
       },
     },
   ];

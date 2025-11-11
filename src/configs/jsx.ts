@@ -2,10 +2,13 @@ import type { OptionsJSX, TypedFlatConfigItem } from '../types';
 import { GLOB_JSX, GLOB_TSX } from '../globs';
 import { ensurePackages, interopDefault } from '../utils';
 
+/**
+ * 为 JSX/TSX 文件启用基础语法支持，可选开启 `a11y` 规则覆盖来对接 `eslint-plugin-jsx-a11y`。
+ */
 export async function jsx(options: OptionsJSX = {}): Promise<TypedFlatConfigItem[]> {
   const { a11y } = options;
 
-  // Base JSX configuration without a11y
+  // 仅提供 JSX 语法解析的基础配置
   const baseConfig: TypedFlatConfigItem = {
     files: [GLOB_JSX, GLOB_TSX],
     languageOptions: {
@@ -20,7 +23,7 @@ export async function jsx(options: OptionsJSX = {}): Promise<TypedFlatConfigItem
     rules: {},
   };
 
-  // Return early if no a11y configuration is needed
+  // 未开启无障碍校验时直接返回基础配置
   if (!a11y) {
     return [baseConfig];
   }
@@ -34,7 +37,7 @@ export async function jsx(options: OptionsJSX = {}): Promise<TypedFlatConfigItem
     ...(typeof a11y === 'object' && a11y.overrides ? a11y.overrides : {}),
   };
 
-  // Merge base config with a11y configuration
+  // 将基础 JSX 解析能力与 a11y 规则合并
   return [
     {
       ...baseConfig,
@@ -50,6 +53,7 @@ export async function jsx(options: OptionsJSX = {}): Promise<TypedFlatConfigItem
         'jsx-a11y': jsxA11yPlugin,
       },
       rules: {
+        // --- 合并基础 JSX 行为与无障碍增强规则 ---
         ...baseConfig.rules,
         ...a11yRules,
       },

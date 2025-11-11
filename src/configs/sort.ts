@@ -1,9 +1,7 @@
 import type { TypedFlatConfigItem } from '../types';
 
 /**
- * Sort package.json
- *
- * Requires `jsonc` config
+ * 针对 package.json 字段进行排序（依赖 jsonc 配置提供的解析器）。
  */
 export async function sortPackageJson(): Promise<TypedFlatConfigItem[]> {
   return [
@@ -11,13 +9,14 @@ export async function sortPackageJson(): Promise<TypedFlatConfigItem[]> {
       files: ['**/package.json'],
       name: 'senran/sort/package-json',
       rules: {
+        // --- package.json 中 files/exports/依赖等字段的排序规则 ---
         'jsonc/sort-array-values': [
           'error',
           {
             order: { type: 'asc' },
             pathPattern: '^files$',
           },
-        ],
+        ], // `files` 数组按字母排序
         'jsonc/sort-keys': [
           'error',
           {
@@ -84,7 +83,7 @@ export async function sortPackageJson(): Promise<TypedFlatConfigItem[]> {
           },
           {
             order: [
-              // client hooks only
+              // 仅在客户端执行的 Git hooks
               'pre-commit',
               'prepare-commit-msg',
               'commit-msg',
@@ -98,15 +97,13 @@ export async function sortPackageJson(): Promise<TypedFlatConfigItem[]> {
             ],
             pathPattern: '^(?:gitHooks|husky|simple-git-hooks)$',
           },
-        ],
+        ], // package.json 顶层及依赖字段排序
       },
     },
   ];
 }
 /**
- * Sort tsconfig.json
- *
- * Requires `jsonc` config
+ * 统一 tsconfig*.json 的字段排序，便于在大型工程中保持一致（同样依赖 jsonc 解析）。
  */
 
 export function sortTsconfig(): TypedFlatConfigItem[] {
@@ -115,6 +112,7 @@ export function sortTsconfig(): TypedFlatConfigItem[] {
       files: ['**/[jt]sconfig.json', '**/[jt]sconfig.*.json'],
       name: 'senran/sort/tsconfig-json',
       rules: {
+        // --- tsconfig*.json 的顶层与 compilerOptions 排序 ---
         'jsonc/sort-keys': [
           'error',
           {
@@ -123,14 +121,14 @@ export function sortTsconfig(): TypedFlatConfigItem[] {
           },
           {
             order: [
-              /* Projects */
+              /* 项目引用 */
               'incremental',
               'composite',
               'tsBuildInfoFile',
               'disableSourceOfProjectReferenceRedirect',
               'disableSolutionSearching',
               'disableReferencedProjectLoad',
-              /* Language and Environment */
+              /* 语言与运行环境 */
               'target',
               'jsx',
               'jsxFactory',
@@ -144,7 +142,7 @@ export function sortTsconfig(): TypedFlatConfigItem[] {
               'emitDecoratorMetadata',
               'experimentalDecorators',
               'libReplacement',
-              /* Modules */
+              /* 模块解析 */
               'baseUrl',
               'rootDir',
               'rootDirs',
@@ -162,11 +160,11 @@ export function sortTsconfig(): TypedFlatConfigItem[] {
               'allowArbitraryExtensions',
               'allowImportingTsExtensions',
               'allowUmdGlobalAccess',
-              /* JavaScript Support */
+              /* JavaScript 支持 */
               'allowJs',
               'checkJs',
               'maxNodeModuleJsDepth',
-              /* Type Checking */
+              /* 类型检查 */
               'strict',
               'strictBindCallApply',
               'strictFunctionTypes',
@@ -186,7 +184,7 @@ export function sortTsconfig(): TypedFlatConfigItem[] {
               'noUnusedLocals',
               'noUnusedParameters',
               'useUnknownInCatchVariables',
-              /* Emit */
+              /* 发射选项 */
               'declaration',
               'declarationDir',
               'declarationMap',
@@ -210,7 +208,7 @@ export function sortTsconfig(): TypedFlatConfigItem[] {
               'sourceMap',
               'sourceRoot',
               'stripInternal',
-              /* Interop Constraints */
+              /* 兼容性约束 */
               'allowSyntheticDefaultImports',
               'esModuleInterop',
               'forceConsistentCasingInFileNames',
@@ -219,13 +217,13 @@ export function sortTsconfig(): TypedFlatConfigItem[] {
               'preserveSymlinks',
               'verbatimModuleSyntax',
               'erasableSyntaxOnly',
-              /* Completeness */
+              /* 完整性 */
               'skipDefaultLibCheck',
               'skipLibCheck',
             ],
             pathPattern: '^compilerOptions$',
           },
-        ],
+        ], // tsconfig 与 compilerOptions 字段排序
       },
     },
   ];

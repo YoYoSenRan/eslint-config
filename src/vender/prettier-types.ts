@@ -1,5 +1,5 @@
 /**
- * Vendor types from Prettier so we don't rely on the dependency.
+ * 从 Prettier 内部拷贝出的类型声明，用于避免在运行时直接依赖 Prettier 包。
  */
 
 export type VendoredPrettierOptions = Partial<VendoredPrettierOptionsRequired>;
@@ -11,115 +11,113 @@ export type VendoredPrettierRuleOptions = VendoredPrettierOptions & {
 
 export interface VendoredPrettierOptionsRequired {
   /**
-   * Specify the line length that the printer will wrap on.
-   * @default 120
+   * 指定打印时的最大行宽，超过后会尝试换行。
+   * @default 150
    */
   printWidth: number;
   /**
-   * Specify the number of spaces per indentation-level.
+   * 每个缩进层级所使用的空格数。
    */
   tabWidth: number;
   /**
-   * Indent lines with tabs instead of spaces
+   * 是否使用 Tab 进行缩进（默认是空格）。
    */
   useTabs?: boolean;
   /**
-   * Print semicolons at the ends of statements.
+   * 是否在语句末尾添加分号。
    */
   semi: boolean;
   /**
-   * Use single quotes instead of double quotes.
+   * 是否使用单引号替换双引号。
    */
   singleQuote: boolean;
   /**
-   * Use single quotes in JSX.
+   * JSX 中是否同样使用单引号。
    */
   jsxSingleQuote: boolean;
   /**
-   * Print trailing commas wherever possible.
+   * 尽可能在可允许的位置添加尾随逗号。
    */
   trailingComma: 'none' | 'es5' | 'all';
   /**
-   * Print spaces between brackets in object literals.
+   * 对象字面量中是否在大括号内侧保留空格。
    */
   bracketSpacing: boolean;
   /**
-   * Put the `>` of a multi-line HTML (HTML, XML, JSX, Vue, Angular) element at the end of the last line instead of being
-   * alone on the next line (does not apply to self closing elements).
+   * 多行 HTML/JSX/Vue/Angular 标签的闭合 `>` 是否跟随在最后一行末尾，而不是另起一行（不影响自闭合标签）。
    */
   bracketSameLine: boolean;
   /**
-   * Put the `>` of a multi-line JSX element at the end of the last line instead of being alone on the next line.
+   * 多行 JSX 标签的闭合 `>` 是否跟在最后一行（已过时，请使用 bracketSameLine）。
    * @deprecated use bracketSameLine instead
    */
   jsxBracketSameLine: boolean;
   /**
-   * Format only a segment of a file.
+   * 仅格式化文件中的某个片段（起始位置）。
    */
   rangeStart: number;
   /**
-   * Format only a segment of a file.
+   * 仅格式化文件中的某个片段（结束位置）。
    * @default Number.POSITIVE_INFINITY
    */
   rangeEnd: number;
   /**
-   * By default, Prettier will wrap markdown text as-is since some services use a linebreak-sensitive renderer.
-   * In some cases you may want to rely on editor/viewer soft wrapping instead, so this option allows you to opt out.
+   * 默认保持 Markdown 文本的手动换行，以兼容敏感渲染器；可设置为依赖编辑器软换行。
    * @default "preserve"
    */
   proseWrap: 'always' | 'never' | 'preserve';
   /**
-   * Include parentheses around a sole arrow function parameter.
+   * 箭头函数只有一个参数时是否仍保留括号。
    * @default "always"
    */
   arrowParens: 'avoid' | 'always';
   /**
-   * Provide ability to support new languages to prettier.
+   * 通过插件扩展 Prettier 支持的新语言。
    */
   plugins: Array<string | any>;
   /**
-   * How to handle whitespaces in HTML.
+   * HTML 中的空白折叠策略。
    * @default "css"
    */
   htmlWhitespaceSensitivity: 'css' | 'strict' | 'ignore';
   /**
-   * Which end of line characters to apply.
+   * 输出时使用的换行符类型。
    * @default "lf"
    */
   endOfLine: 'auto' | 'lf' | 'crlf' | 'cr';
   /**
-   * Change when properties in objects are quoted.
+   * 对象属性名加引号的策略。
    * @default "as-needed"
    */
   quoteProps: 'as-needed' | 'consistent' | 'preserve';
   /**
-   * Whether or not to indent the code inside <script> and <style> tags in Vue files.
+   * Vue 文件中是否缩进 `<script>` 和 `<style>` 内的代码。
    * @default false
    */
   vueIndentScriptAndStyle: boolean;
   /**
-   * Enforce single attribute per line in HTML, XML, Vue and JSX.
+   * 是否强制 HTML/XML/Vue/JSX 每行只保留一个属性。
    * @default false
    */
   singleAttributePerLine: boolean;
 
   /**
-   * How to handle whitespaces in XML.
+   * XML 属性值使用的引号类型。
    * @default "preserve"
    */
   xmlQuoteAttributes: 'single' | 'double' | 'preserve';
   /**
-   * Whether to put a space inside the brackets of self-closing XML elements.
+   * XML 自闭合标签的 `/>` 是否保留空格。
    * @default true
    */
   xmlSelfClosingSpace: boolean;
   /**
-   * Whether to sort attributes by key in XML elements.
+   * XML 属性是否按属性名排序。
    * @default false
    */
   xmlSortAttributesByKey: boolean;
   /**
-   * How to handle whitespaces in XML.
+   * XML 中的空白折叠策略。
    * @default "ignore"
    */
   xmlWhitespaceSensitivity: 'ignore' | 'strict' | 'preserve';
@@ -153,11 +151,6 @@ export type BuiltInParserName =
 
 export type ExternalParserName = 'slidev' | 'astro';
 
-// This utility is here to handle the case where you have an explicit union
-// between string literals and the generic string type. It would normally
-// resolve out to just the string type, but this generic LiteralUnion maintains
-// the intellisense of the original union.
-//
-// It comes from this issue: microsoft/TypeScript#29729:
-//   https://github.com/microsoft/TypeScript/issues/29729#issuecomment-700527227
+// 为了解决在字符串字面量联合中混入 string 泛型导致类型信息丢失的问题。
+// LiteralUnion 能保留原始字面量联合的智能提示能力：见 microsoft/TypeScript#29729。
 export type LiteralUnion<T extends U, U = string> = T | (Pick<U, never> & { _?: never | undefined });

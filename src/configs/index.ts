@@ -1,3 +1,6 @@
+/**
+ * 汇总所有配置模块，方便外部以单入口方式导入。
+ */
 export * from './comments';
 export * from './disables';
 export * from './formatters';

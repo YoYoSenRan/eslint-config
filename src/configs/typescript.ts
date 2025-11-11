@@ -4,6 +4,9 @@ import process from 'node:process';
 import { interopDefault, renameRules } from '../utils';
 import { GLOB_ASTRO_TS, GLOB_MARKDOWN, GLOB_TS, GLOB_TSX } from '../globs';
 
+/**
+ * TypeScript 栈的核心配置：自动挂载解析器、根据 `tsconfigPath` 区分类型感知/非感知文件，并提供 `type`、`componentExts` 等拓展选项。
+ */
 export async function typescript(
   options: OptionsFiles & OptionsComponentExts & OptionsOverrides & OptionsTypeScriptWithTypes & OptionsTypeScriptParserOptions & OptionsProjectType = {}
 ): Promise<TypedFlatConfigItem[]> {
@@ -69,26 +72,27 @@ export async function typescript(
 
   return [
     {
-      // Install the plugins without globs, so they can be configured separately.
+      // 预先安装插件但不匹配具体文件，方便下方根据不同 globs 细分配置
       name: 'senran/typescript/setup',
       plugins: {
         ts: pluginTs as any,
       },
     },
-    // assign type-aware parser for type-aware files and type-unaware parser for the rest
+    // 若提供 tsconfig，则区分类型感知与普通文件使用不同的 parser 配置
     ...(isTypeAware ? [makeParser(false, files), makeParser(true, filesTypeAware, ignoresTypeAware)] : [makeParser(false, files)]),
     {
       files,
       name: 'senran/typescript/rules',
       rules: {
+        // --- 基础：沿用 TS 插件推荐规则并与原生 ESLint 去重 ---
         ...renameRules(pluginTs.configs['eslint-recommended'].overrides![0].rules!, { '@typescript-eslint': 'ts' }),
         ...renameRules(pluginTs.configs.strict.rules!, { '@typescript-eslint': 'ts' }),
-        'no-dupe-class-members': 'off',
-        'no-redeclare': 'off',
-        'no-use-before-define': 'off',
-        'no-useless-constructor': 'off',
-        'ts/ban-ts-comment': ['error', { 'ts-expect-error': 'allow-with-description' }],
-        'ts/consistent-type-definitions': ['error', 'interface'],
+        'no-dupe-class-members': 'off', // 由 ts/no-dupe-class-members 接管
+        'no-redeclare': 'off', // 使用 TS 版本避免误报
+        'no-use-before-define': 'off', // 同上
+        'no-useless-constructor': 'off', // 交给 TS 规则判断
+        'ts/ban-ts-comment': ['error', { 'ts-expect-error': 'allow-with-description' }], // 允许带描述的 @ts-expect-error
+        'ts/consistent-type-definitions': ['error', 'interface'], // 统一使用 interface
         'ts/consistent-type-imports': [
           'error',
           {
@@ -96,19 +100,19 @@ export async function typescript(
             fixStyle: 'separate-type-imports',
             prefer: 'type-imports',
           },
-        ],
+        ], // type-only import/export
 
-        'ts/method-signature-style': ['error', 'property'], // https://www.totaltypescript.com/method-shorthand-syntax-considered-harmful
-        'ts/no-dupe-class-members': 'error',
-        'ts/no-dynamic-delete': 'off',
-        'ts/no-empty-object-type': ['error', { allowInterfaces: 'always' }],
-        'ts/no-explicit-any': 'off',
-        'ts/no-extraneous-class': 'off',
-        'ts/no-import-type-side-effects': 'error',
-        'ts/no-invalid-void-type': 'off',
-        'ts/no-non-null-assertion': 'off',
-        'ts/no-redeclare': ['error', { builtinGlobals: false }],
-        'ts/no-require-imports': 'error',
+        'ts/method-signature-style': ['error', 'property'], // method 使用属性式声明，便于一致性
+        'ts/no-dupe-class-members': 'error', // 禁止在类型系统中重复成员
+        'ts/no-dynamic-delete': 'off', // 允许 delete 任意属性
+        'ts/no-empty-object-type': ['error', { allowInterfaces: 'always' }], // 禁止 {} 作为返回类型
+        'ts/no-explicit-any': 'off', // 允许 any（由项目自行控制）
+        'ts/no-extraneous-class': 'off', // 允许空类用于模式
+        'ts/no-import-type-side-effects': 'error', // type import 中不得带副作用
+        'ts/no-invalid-void-type': 'off', // 允许 void 用于泛型
+        'ts/no-non-null-assertion': 'off', // 允许使用 !
+        'ts/no-redeclare': ['error', { builtinGlobals: false }], // 防止类型/变量重复声明
+        'ts/no-require-imports': 'error', // 禁止 require，引导到 import
         'ts/no-unused-expressions': [
           'error',
           {
@@ -116,16 +120,17 @@ export async function typescript(
             allowTaggedTemplates: true,
             allowTernary: true,
           },
-        ],
-        'ts/no-unused-vars': 'off',
-        'ts/no-use-before-define': ['error', { classes: false, functions: false, variables: true }],
-        'ts/no-useless-constructor': 'off',
-        'ts/no-wrapper-object-types': 'error',
-        'ts/triple-slash-reference': 'off',
-        'ts/unified-signatures': 'off',
+        ], // 阻止类型层面的无意义表达式
+        'ts/no-unused-vars': 'off', // 使用 unused-imports/no-unused-vars
+        'ts/no-use-before-define': ['error', { classes: false, functions: false, variables: true }], // TypeScript 版本的提前使用守护
+        'ts/no-useless-constructor': 'off', // 允许装饰器等场景使用空构造
+        'ts/no-wrapper-object-types': 'error', // 禁止使用 Wrapper 类型（String/Number）
+        'ts/triple-slash-reference': 'off', // 允许三斜线引用
+        'ts/unified-signatures': 'off', // 允许重复签名用于重载
 
         ...(type === 'lib'
           ? {
+              // --- 库模式：要求显式函数返回类型，便于对外 API ---
               'ts/explicit-function-return-type': [
                 'error',
                 {
@@ -139,18 +144,19 @@ export async function typescript(
         ...overrides,
       },
     },
-    ...(isTypeAware
-      ? [
-          {
-            files: filesTypeAware,
-            ignores: ignoresTypeAware,
-            name: 'senran/typescript/rules-type-aware',
-            rules: {
-              ...typeAwareRules,
-              ...overridesTypeAware,
-            },
-          },
-        ]
+        ...(isTypeAware
+          ? [
+              {
+                files: filesTypeAware,
+                ignores: ignoresTypeAware,
+                name: 'senran/typescript/rules-type-aware',
+                rules: {
+                  // --- 类型感知规则：聚焦 Promise/类型安全 ---
+                  ...typeAwareRules,
+                  ...overridesTypeAware,
+                },
+              },
+            ]
       : []),
   ];
 }

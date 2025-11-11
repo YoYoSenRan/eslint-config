@@ -2,6 +2,9 @@ import type { OptionsUnoCSS, TypedFlatConfigItem } from '../types';
 
 import { ensurePackages, interopDefault } from '../utils';
 
+/**
+ * 针对 UnoCSS 原子化样式的 ESLint 规则，支持 `attributify` 顺序和 `strict` 黑名单校验。
+ */
 export async function unocss(options: OptionsUnoCSS = {}): Promise<TypedFlatConfigItem[]> {
   const { attributify = true, strict = false } = options;
 
@@ -16,15 +19,16 @@ export async function unocss(options: OptionsUnoCSS = {}): Promise<TypedFlatConf
         unocss: pluginUnoCSS,
       },
       rules: {
-        'unocss/order': 'warn',
+        // --- UnoCSS utility 排序及可选黑名单 ---
+        'unocss/order': 'warn', // UnoCSS 类名按原子顺序排列
         ...(attributify
           ? {
-              'unocss/order-attributify': 'warn',
+              'unocss/order-attributify': 'warn', // attr 模式的属性顺序
             }
           : {}),
         ...(strict
           ? {
-              'unocss/blocklist': 'error',
+              'unocss/blocklist': 'error', // 启用黑名单
             }
           : {}),
       },
