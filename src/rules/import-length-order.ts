@@ -258,10 +258,11 @@ export const importLengthOrderRule = createEslintRule<Options, MessageIds>({
     }
 
     /**
-     * 计算单个 specifier 的长度（包括别名）
+     * 计算单个 specifier 的长度（基于导入名称）
      */
     function getSpecifierComparableLength(specifier: TSESTree.ImportSpecifier): number {
-      return sourceCode.getText(specifier).length;
+      const importedName = specifier.imported.type === "Identifier" ? specifier.imported.name : specifier.imported.value;
+      return importedName.length;
     }
 
     /**
@@ -349,7 +350,7 @@ export const importLengthOrderRule = createEslintRule<Options, MessageIds>({
       Program(programNode) {
         // 收集文件顶部的 import/export 语句块
         const sortableNodes = collectSortableBlock(programNode);
-        if (sortableNodes.length < 2) {
+        if (sortableNodes.length < 1) {
           return;
         }
 
@@ -360,15 +361,23 @@ export const importLengthOrderRule = createEslintRule<Options, MessageIds>({
           return;
         }
 
+        // 如果只有单个导入，检查其 specifier 排序
+        if (sortableNodes.length === 1) {
+          const node = sortableNodes[0];
+          if (node.type === "ImportDeclaration") {
+            enforceSpecifierOrder(node);
+          }
+          return;
+        }
+
         // 构建排序项，保留原始段落信息以支持注释保留
         const items = sortableNodes.map((node, index) => {
           const next = sortableNodes[index + 1];
           const nodeText = sourceCode.getText(node);
           const endPos = node.range[1];
-          // 仅获取到下一个导入节点之间的间隔内容（包括换行和注释）
-          // 对于最后一个节点，trailing 应该是空的（因为后续可能是其他代码）
+          // 获取到下一个导入节点之间的间隔内容（包括换行和注释）
           const trailingPos = next ? next.range[0] : node.range[1];
-          const trailing = next ? sourceCode.text.slice(endPos, trailingPos) : "";
+          const trailing = sourceCode.text.slice(endPos, trailingPos);
 
           // 检查是否应该忽略此导入（用户配置了忽略列表）
           const moduleName = getModuleName(node);
@@ -426,10 +435,26 @@ export const importLengthOrderRule = createEslintRule<Options, MessageIds>({
           node: sortableNodes[firstMismatchIndex],
           fix(fixer) {
             // 重新组织排序后的导入块
-            // 每项包含 nodeText + 其后的 trailing（包括到下一项的间隔）
+            // 从原始最后一个导入后获取尾部内容（如换行符或注释）
+            const lastOriginalTrailing = items[items.length - 1].trailing;
+
             const rewritten = sorted
-              .map((item) => {
-                return item.nodeText + item.trailing;
+              .map((item, idx) => {
+                const isLast = idx === sorted.length - 1;
+                if (isLast) {
+                  // 最后一项：使用原始最后一个节点的 trailing，如果为空则添加换行
+                  const trailingToUse = lastOriginalTrailing || "\n";
+                  return `${item.nodeText}${trailingToUse}`;
+                }
+                // 非最后一项：查找其原始位置后的第一个换行
+                const itemOriginalTrailing = items[item.originalIndex].trailing;
+                // 如果原始 trailing 中有换行，保留它；否则添加一个换行
+                if (itemOriginalTrailing && itemOriginalTrailing.trim() === "") {
+                  // trailing 是纯空白（包含换行），保留
+                  return `${item.nodeText}${itemOriginalTrailing}`;
+                }
+                // trailing 为空或包含非空白内容，添加换行
+                return `${item.nodeText}\n`;
               })
               .join("");
             return fixer.replaceTextRange([replaceStart, replaceEnd], rewritten);

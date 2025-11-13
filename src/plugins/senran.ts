@@ -9,7 +9,7 @@ import { importLengthOrderRule } from "../rules/import-length-order";
 
 const plugin = {
   meta: {
-    name: "kirklin",
+    name: "senran",
     version: "1.0.0",
   },
   rules: {
