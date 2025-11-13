@@ -4,7 +4,7 @@ import { join, resolve } from "node:path";
 import { readdirSync, readFileSync } from "node:fs";
 
 const repoRoot = process.cwd();
-const rulesFixtureRoot = resolve(repoRoot, "test", "rules");
+const rulesFixtureRoot = resolve(repoRoot, "test", "fixtures", "rules");
 
 interface FixtureFile {
   name: string;
@@ -20,7 +20,7 @@ interface ParserRegistration {
  * 读取指定规则的夹具文件内容
  */
 export function readRuleFixture(ruleName: string, ...segments: string[]): string {
-  const fixturePath = resolve(rulesFixtureRoot, ruleName, "fixtures", ...segments);
+  const fixturePath = resolve(rulesFixtureRoot, ruleName, ...segments);
   return readFileSync(fixturePath, "utf-8");
 }
 
@@ -28,7 +28,7 @@ export function readRuleFixture(ruleName: string, ...segments: string[]): string
  * 获取规则某分类下的全部夹具文件，返回名称 + 内容，用于参数化测试
  */
 export function loadRuleFixtureGroup(ruleName: string, group: string): FixtureFile[] {
-  const directory = resolve(rulesFixtureRoot, ruleName, "fixtures", group);
+  const directory = resolve(rulesFixtureRoot, ruleName, group);
   const files = readdirSync(directory, { withFileTypes: true })
     .filter(entry => entry.isFile())
     .map(entry => entry.name)
@@ -41,7 +41,7 @@ export function loadRuleFixtureGroup(ruleName: string, group: string): FixtureFi
 }
 
 function readFileFixture(ruleName: string, group: string, fileName: string): string {
-  return readFileSync(join(rulesFixtureRoot, ruleName, "fixtures", group, fileName), "utf-8");
+  return readFileSync(join(rulesFixtureRoot, ruleName, group, fileName), "utf-8");
 }
 
 /**

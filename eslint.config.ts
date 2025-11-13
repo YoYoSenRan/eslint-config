@@ -14,5 +14,5 @@ export default eslint(
     vue: { a11y: true },
     jsx: { a11y: true },
   },
-  { ignores: ["fixtures", "_fixtures", "**/constants-generated.ts"] },
+  { ignores: ["fixtures", "_fixtures", "test/fixtures", "**/constants-generated.ts"] },
 );
