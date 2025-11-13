@@ -1,5 +1,5 @@
 /**
- * 配置工厂模块
+ * 集成模块
  * 负责组装和管理不同的 ESLint 配置
  * 提供创建 ESLint 配置的主要工厂函数
  */
@@ -8,8 +8,8 @@ import type { Linter } from "eslint";
 import type { RuleOptions } from "./types/typegen";
 import type { Awaitable, ConfigNames, OptionsConfig, TypedFlatConfigItem } from "./types";
 
-import { regexp } from "./configs/regexp";
-import { formatters } from "./configs/formatters";
+import { regexp } from "./integrations/regexp";
+import { formatters } from "./integrations/formatters";
 import { isPackageExists } from "local-pkg";
 import { FlatConfigComposer } from "eslint-flat-config-utils";
 import { isInEditorEnv, interopDefault } from "./utils";
@@ -41,7 +41,7 @@ import {
   sortTsconfig,
   perfectionist,
   sortPackageJson,
-} from "./configs";
+} from "./integrations";
 
 const flatConfigProps = ["name", "languageOptions", "linterOptions", "processor", "plugins", "rules", "settings"] satisfies (keyof TypedFlatConfigItem)[];
 
