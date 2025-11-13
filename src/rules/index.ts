@@ -4,3 +4,4 @@
  */
 
 export * from "./import-length-order";
+export * from "./css-property-order";

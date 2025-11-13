@@ -4,6 +4,7 @@
  */
 
 import type { ESLint } from "eslint";
+import { cssPropertyOrderRule } from "../rules/css-property-order";
 import { importLengthOrderRule } from "../rules/import-length-order";
 
 const plugin = {
@@ -12,6 +13,7 @@ const plugin = {
     version: "1.0.0",
   },
   rules: {
+    "css-property-order": cssPropertyOrderRule,
     "import-length-order": importLengthOrderRule,
   },
 } satisfies ESLint.Plugin;

@@ -32,6 +32,7 @@ export const parserPlain = {
  * 记录已经撰写独立文档的规则名称，便于自动拼装链接。
  */
 const hasDocs = [
+  "css-property-order",
   "import-length-order",
 ] as const;
 
