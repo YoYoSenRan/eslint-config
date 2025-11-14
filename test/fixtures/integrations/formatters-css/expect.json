@@ -12,6 +12,40 @@
           "severity": 2
         }
       ]
+    },
+    {
+      "filePath": "styles/component.scss",
+      "errorCount": 2,
+      "warningCount": 0,
+      "messages": [
+        {
+          "ruleId": "format/prettier",
+          "line": 1,
+          "severity": 2
+        },
+        {
+          "ruleId": "format/prettier",
+          "line": 2,
+          "severity": 2
+        }
+      ]
+    },
+    {
+      "filePath": "styles/layout.less",
+      "errorCount": 2,
+      "warningCount": 0,
+      "messages": [
+        {
+          "ruleId": "format/prettier",
+          "line": 1,
+          "severity": 2
+        },
+        {
+          "ruleId": "format/prettier",
+          "line": 2,
+          "severity": 2
+        }
+      ]
     }
   ]
 }

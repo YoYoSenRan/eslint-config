@@ -19,7 +19,7 @@
     "build": "nr gen && rollup --config rollup.config.ts --configPlugin typescript",
     "build:inspector": "pnpm build && npx @eslint/config-inspector build",
     "gen": "tsx scripts/typegen.ts",
-    "release": "bumpp && pnpm publish",
+    "release": "pnpm publish",
     "typecheck": "tsc --noEmit",
     "test": "vitest",
     "lint": "eslint",
