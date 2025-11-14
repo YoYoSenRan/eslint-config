@@ -108,9 +108,14 @@ export async function lintIntegrationFixture(configs: TypedFlatConfigItem[], fix
   });
 
   const lintResults = await eslint.lintFiles(fixture.files.map(file => file.absolutePath));
+  const isIgnoredResult = (result: ESLint.LintResult): boolean =>
+    result.messages.length > 0
+    && result.messages.every(message => message.ruleId == null && message.message?.includes("File ignored because of"));
+
+  const filteredResults = lintResults.filter(result => !isIgnoredResult(result));
 
   let formattedLookup: Map<string, string> | undefined;
-  if (lintResults.some(result => result.messages.some(message => message.fix))) {
+  if (filteredResults.some(result => result.messages.some(message => message.fix))) {
     const eslintFix = new ESLint({
       cwd: repoRoot,
       fix: true,
@@ -125,7 +130,7 @@ export async function lintIntegrationFixture(configs: TypedFlatConfigItem[], fix
     );
   }
 
-  const normalized = lintResults.map(result => ({
+  const normalized = filteredResults.map(result => ({
     filePath: relative(fixture.filesRoot, result.filePath),
     errorCount: result.errorCount,
     warningCount: result.warningCount,

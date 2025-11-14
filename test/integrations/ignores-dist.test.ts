@@ -1,5 +1,5 @@
 import { eslint } from "../../src";
-import { it, describe } from "vitest";
+import { it, expect, describe } from "vitest";
 import { lintIntegrationFixture, loadIntegrationFixture, assertIntegrationResults } from "../helpers/integration-testing";
 
 describe("集成夹具：ignores-dist", () => {
@@ -9,6 +9,7 @@ describe("集成夹具：ignores-dist", () => {
     const flatConfigs = await composer.toConfigs();
 
     const results = await lintIntegrationFixture(flatConfigs, fixture);
+    expect(results.some(result => result.filePath.startsWith("dist/"))).toBe(false);
     assertIntegrationResults(results, fixture);
   });
 });
