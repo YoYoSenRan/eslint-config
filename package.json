@@ -1,5 +1,5 @@
 {
-  "name": "@surges-design/eslint-config",
+  "name": "@fond-web/eslint-config",
   "type": "module",
   "version": "1.0.0",
   "private": false,
