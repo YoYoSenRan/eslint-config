@@ -1,5 +1,5 @@
 {
-  "name": "@senran/eslint-config",
+  "name": "@surges-design/eslint-config",
   "type": "module",
   "version": "1.0.0",
   "private": false,
