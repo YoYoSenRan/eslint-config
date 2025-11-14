@@ -20,6 +20,7 @@
     "build:inspector": "pnpm build && npx @eslint/config-inspector build",
     "gen": "tsx scripts/typegen.ts",
     "release": "bumpp && pnpm publish",
+    "typecheck": "tsc --noEmit",
     "test": "vitest",
     "lint": "eslint",
     "lint:fix": "eslint --fix"
