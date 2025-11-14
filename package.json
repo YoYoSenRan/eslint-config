@@ -17,10 +17,12 @@
   ],
   "scripts": {
     "build": "nr gen && rollup --config rollup.config.ts --configPlugin typescript",
+    "build:inspector": "pnpm build && npx @eslint/config-inspector build",
+    "gen": "tsx scripts/typegen.ts",
+    "release": "bumpp && pnpm publish",
     "test": "vitest",
     "lint": "eslint",
-    "lint:fix": "eslint --fix",
-    "gen": "tsx scripts/typegen.ts"
+    "lint:fix": "eslint --fix"
   },
   "devDependencies": {
     "@antfu/install-pkg": "^1.1.0",
