@@ -1,7 +1,7 @@
 {
   "name": "@fond-web/eslint-config",
   "type": "module",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "private": false,
   "packageManager": "pnpm@10.15.0",
   "description": "一个可复用、可扩展的 ESLint 配置预设，用于在团队或个人项目中保持一致的代码风格和质量。",
