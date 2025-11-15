@@ -4,7 +4,9 @@
  */
 
 import type { TypedFlatConfigItem } from "../types";
+import { parserPlain } from "../utils";
 import { pluginSenran } from "../plugins";
+import { GLOB_CSS, GLOB_LESS, GLOB_SCSS } from "../globs";
 
 /**
  * 针对 package.json 字段进行排序（依赖 jsonc 配置提供的解析器）。
@@ -238,13 +240,26 @@ export function sortTsconfig(): TypedFlatConfigItem[] {
 export function sortImports(): TypedFlatConfigItem[] {
   return [
     {
+      files: [GLOB_CSS, GLOB_SCSS, GLOB_LESS],
+      languageOptions: {
+        parser: parserPlain,
+      },
+      name: "senran/sort/css-property-order",
+      plugins: {
+        senran: pluginSenran,
+      },
+      rules: {
+        // --- 样式文件通过占位解析器运行自定义属性排序 ---
+        "senran/css-property-order": "error",
+      },
+    },
+    {
       name: "senran/sort/rules",
       plugins: {
         senran: pluginSenran,
       },
       rules: {
         "senran/import-length-order": "error",
-        "senran/css-property-order": "error",
       },
     },
   ];
